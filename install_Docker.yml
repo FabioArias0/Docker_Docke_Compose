@@ -11,22 +11,26 @@
           - gnupg-agent
           - software-properties-common
         state: present
+      become: true
       when: ansible_os_family == 'Debian'
 
     - name: Add Docker APT key
       ansible.builtin.apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
+      become: true
       when: ansible_os_family == 'Debian'
 
     - name: Add Docker APT repository
       ansible.builtin.apt_repository:
         repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+      become: true
       when: ansible_os_family == 'Debian'
 
     - name: Update apt and install Docker CE
       ansible.builtin.package:
         name: docker-ce
         state: latest
+      become: true
       when: ansible_os_family == 'Debian'
 
     - name: Install Docker Compose
@@ -34,17 +38,12 @@
         url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
         dest: /usr/local/bin/docker-compose
         mode: '0755'
-      when: ansible_distribution == 'Ubuntu'
-
-    - name: Install Docker Compose
-      ansible.builtin.get_url:
-        url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
-        dest: /usr/local/bin/docker-compose
-        mode: '0755'
-      when: ansible_distribution == 'Debian'
+      become: true
+      when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
     - name: Start and enable Docker service
       ansible.builtin.service:
         name: docker
         state: started
         enabled: yes
+      become: true
