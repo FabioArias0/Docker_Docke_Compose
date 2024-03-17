@@ -1,0 +1,37 @@
+---
+- name: Clone web-rust-api repository and execute docker-compose
+  hosts: your_host  # Reemplaza "your_host" con el nombre del grupo de hosts donde deseas ejecutar este playbook
+  become: true
+  vars:
+    repository_url: "https://github.com/FabioArias0/web-rust-api"
+  tasks:
+    - name: Check if git is installed
+      ansible.builtin.command: git --version
+      register: git_check
+      ignore_errors: yes
+
+    - name: Install git if not installed
+      ansible.builtin.package:
+        name: git
+        state: present
+      when: git_check.rc != 0
+
+    - name: Clone web-rust-api repository
+      ansible.builtin.git:
+        repo: "{{ repository_url }}"
+        dest: /path/to/clone/web-rust-api
+        version: main
+
+    - name: Execute docker-compose
+      ansible.builtin.command: docker-compose up -d
+      args:
+        chdir: /path/to/clone/web-rust-api
+
+    - name: Commit changes to main branch
+      ansible.builtin.git:
+        repo: /path/to/clone/web-rust-api
+        msg: "Successfully connected and executed the app."
+        push: yes
+        push_to: origin
+        remote: origin
+        branch: main
