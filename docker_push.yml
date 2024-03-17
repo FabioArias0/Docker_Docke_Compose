@@ -1,6 +1,6 @@
 ---
 - name: Clone web-rust-api repository and execute docker-compose
-  hosts: your_host  # Reemplaza "your_host" con el nombre del grupo de hosts donde deseas ejecutar este playbook
+  hosts: all
   become: true
   vars:
     repository_url: "https://github.com/FabioArias0/web-rust-api"
