@@ -30,7 +30,7 @@
     - name: Commit changes to main branch
       ansible.builtin.git:
         repo: /path/to/clone/web-rust-api
-        msg: "Successfully connected and executed the app."
+        msg: "Successfully connected and executed the app on {{ ansible_hostname }}."
         push: yes
         push_to: origin
         remote: origin
