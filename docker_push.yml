@@ -40,12 +40,11 @@
       when: ansible_os_family == 'Debian'
 
 
-
     - name: Clone web-rust-api repository
       ansible.builtin.git:
         repo: "{{ repository_url }}"
         dest: /path/to/clone/web-rust-api
-        version: main
+        version: master
 
     - name: Execute docker-compose
       ansible.builtin.command: docker-compose up -d
