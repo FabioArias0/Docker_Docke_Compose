@@ -23,9 +23,15 @@
       ansible.builtin.package:
         name: apt-transport-https, ca-certificates, curl, gnupg-agent, software-properties-common
         state: present
-
+  
     - name: Add Docker APT key
-      ansible.builtin.command: curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/debian/gpg
+        dest: /tmp/docker_gpg_key
+      when: ansible_os_family == 'Debian'
+
+    - name: Add Docker APT key to APT keyring on Debian
+      ansible.builtin.command: apt-key add /tmp/docker_gpg_key
       when: ansible_os_family == 'Debian'
 
     - name: Add Docker APT repository
@@ -42,32 +48,12 @@
       ansible.builtin.stat:
         path: /path/to/web-rust-api
       register: repo_stat
-
+    
     - name: Clone web-rust-api repository if not already cloned
       ansible.builtin.git:
         repo: https://github.com/FabioArias0/web-rust-api
         dest: /path/to/web-rust-api
       when: repo_stat.stat.isdir == False
-
-    - name: Add Docker APT key on Debian
-      ansible.builtin.get_url:
-        url: https://download.docker.com/linux/debian/gpg
-        dest: /tmp/docker_gpg_key
-      when: ansible_distribution == 'Debian'
-
-    - name: Add Docker APT key on Ubuntu
-      ansible.builtin.get_url:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        dest: /tmp/docker_gpg_key
-      when: ansible_distribution == 'Ubuntu'
-
-    - name: Add Docker APT key to APT keyring on Debian
-      ansible.builtin.command: apt-key add /tmp/docker_gpg_key
-      when: ansible_distribution == 'Debian'
-
-    - name: Add Docker APT key to APT keyring on Ubuntu
-      ansible.builtin.command: apt-key add /tmp/docker_gpg_key
-      when: ansible_distribution == 'Ubuntu'
 
     - name: Execute docker-compose
       ansible.builtin.command: docker-compose up -d
