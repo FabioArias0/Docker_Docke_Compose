@@ -15,14 +15,17 @@
         name: git
         state: present
       when: git_check.rc != 0
-    
-    - name: Install dependencies on Debian
-      ansible.builtin.command: >
-        apt-get update &&
-        apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-      when: ansible_os_family == 'Debian'
- 
 
+    - name: Install dependencies on Debian
+        ansible.builtin.command: apt-get update
+  
+
+    - name: Install additional packages on Debian
+        ansible.builtin.package:
+          name: apt-transport-https, ca-certificates, curl, gnupg-agent, software-properties-common
+          state: present
+  
+        
     - name: Add Docker APT key
       ansible.builtin.command: curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
       when: ansible_os_family == 'Debian'
@@ -34,7 +37,7 @@
  
 
     - name: Install Docker CE on Debian
-      ansible.builtin.package:
+      ansible.builtin.package: 
         name: docker-ce docker-ce-cli containerd.io
         state: present
       when: ansible_os_family == 'Debian'
