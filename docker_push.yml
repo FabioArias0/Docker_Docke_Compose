@@ -16,11 +16,13 @@
         state: present
       when: git_check.rc != 0
     
-    - name: Clone web-rust-api repository if not already cloned
+    - name: Clone web-rust-api repository
       ansible.builtin.git:
         repo: "{{ repository_url }}"
         dest: /path/to/web-rust-api
-      when: repo_stat.stat.isdir == False
+        clone: yes
+        update: yes
+      
 
     - name: Execute docker-compose
       ansible.builtin.command: docker-compose up -d
