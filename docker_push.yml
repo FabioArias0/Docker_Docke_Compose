@@ -63,7 +63,7 @@
       when: ansible_distribution == 'Debian'
 
     - name: Add Docker APT key on Ubuntu
-       ansible.builtin.get_url:
+      ansible.builtin.get_url:
         url: https://download.docker.com/linux/ubuntu/gpg
         dest: /tmp/docker_gpg_key
       when: ansible_distribution == 'Ubuntu'
