@@ -16,27 +16,7 @@
         state: present
       when: git_check.rc != 0
 
-    - name: Install dependencies on Debian
-      ansible.builtin.package:
-        name:
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gnupg-agent
-          - software-properties-common
-        state: present
-      when: ansible_os_family == 'Debian'
-
-    - name: Add Docker APT key
-      ansible.builtin.get_url:
-        url: https://download.docker.com/linux/debian/gpg
-        dest: /tmp/docker_gpg_key
-      when: ansible_os_family == 'Debian'
-
-    - name: Add Docker APT key to APT keyring on Debian
-      ansible.builtin.command: apt-key add /tmp/docker_gpg_key
-      when: ansible_os_family == 'Debian'
-
+    
     - name: Add Docker APT repository
       ansible.builtin.command: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
       when: ansible_os_family == 'Debian'
