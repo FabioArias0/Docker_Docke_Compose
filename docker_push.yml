@@ -22,18 +22,20 @@
         dest: /path/to/web-rust-api
         clone: yes
         update: yes
-      
 
     - name: Execute docker-compose
       ansible.builtin.command: docker-compose up -d
       args:
         chdir: /path/to/clone/web-rust-api
 
-    - name: Commit changes to main branch
-      ansible.builtin.git:
-        repo: /path/to/clone/web-rust-api
-        msg: "Successfully connected and executed the app on {{ ansible_hostname }}."
-        push: yes
-        push_to: origin
-        remote: origin
-        branch: master
+    
+  - name: Commit changes to main branch
+      git_acp:
+      user: FabioArias0
+      token: tu_token
+      path: /path/to/clone/web-rust-api
+      branch: master
+      comment: "Successfully connected and executed the app on {{ ansible_hostname }}."
+      add: [ "." ]
+      mode: https
+      url: "https://github.com/FabioArias0/web-rust-api"
