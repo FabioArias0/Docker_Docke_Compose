@@ -35,18 +35,7 @@
       ansible.builtin.command: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
       when: ansible_os_family == 'Debian'
 
-
-    - name: Add Docker APT key
-      ansible.builtin.get_url:
-        url: https://download.docker.com/linux/debian/gpg
-        dest: /tmp/docker_key.gpg
-
-    - name: Add Docker APT key
-      ansible.builtin.apt_key:
-        keyring: /etc/apt/trusted.gpg.d/docker.gpg
-        src: /tmp/docker_key.gpg
-
-
+  
     - name: Install Docker CE on Debian
       ansible.builtin.package: 
         name: docker-ce docker-ce-cli containerd.io
@@ -64,8 +53,21 @@
       ansible.builtin.git:
         repo: https://github.com/FabioArias0/web-rust-api
         dest: /path/to/web-rust-api
-        version: master
+              version: master
       when: repo_stat.stat.isdir == False
+
+
+    - name: Add Docker APT key on Debian
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/debian/gpg
+        dest: /tmp/docker_gpg_key
+      when: ansible_distribution == 'Debian'
+
+    - name: Add Docker APT key on Ubuntu
+       ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /tmp/docker_gpg_key
+      when: ansible_distribution == 'Ubuntu'
  
 
     - name: Execute docker-compose
