@@ -15,11 +15,6 @@
         name: git
         state: present
       when: git_check.rc != 0
-
-    - name: Check if web-rust-api repository is already cloned
-      ansible.builtin.stat:
-        path: /path/to/web-rust-api
-      register: repo_stat
     
     - name: Clone web-rust-api repository if not already cloned
       ansible.builtin.git:
