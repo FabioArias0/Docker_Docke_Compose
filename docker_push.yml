@@ -29,12 +29,12 @@
         chdir: /path/to/clone/web-rust-api
     
     - name: Commit changes to main branch
-        git_acp:
-          user: FabioArias0
-          token: AWS-ubuntu-deployment
-          path: /path/to/clone/web-rust-api
-          branch: master
-          comment: "Successfully connected and executed the app on {{ ansible_hostname }}."
-          add: [ "." ]
-          mode: https
-          url: "https://github.com/FabioArias0/web-rust-api"
+      git_acp:
+        user: FabioArias0
+        token: AWS-ubuntu-deployment
+        path: /path/to/clone/web-rust-api
+        branch: master
+        comment: "Successfully connected and executed the app on {{ ansible_hostname }}."
+        add: [ "." ]
+        mode: https
+        url: "https://github.com/FabioArias0/web-rust-api"
