@@ -61,4 +61,4 @@
         push: yes
         push_to: origin
         remote: origin
-        branch: main
+        branch: master
