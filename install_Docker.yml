@@ -2,6 +2,13 @@
 - name: Install Docker and Docker Compose
   hosts: all
   tasks:
+    - name: Check if Docker is installed - Debian
+      ansible.builtin.command: "dpkg -l | grep -E '^ii' | grep -E 'docker-ce|docker-ce-cli|containerd.io'"
+      register: docker_installed
+      changed_when: false
+      become: true
+      when: ansible_os_family == 'Debian'
+
     - name: Install prerequisites - Debian
       ansible.builtin.package:
         name:
@@ -10,9 +17,59 @@
           - curl
           - gnupg-agent
           - software-properties-common
+      become: true
+      when: ansible_os_family == 'Debian' and docker_installed.rc != 0
+
+    - name: Add Docker APT key - Debian
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+      become: true
+      when: ansible_os_family == 'Debian' and docker_installed.rc != 0
+
+    - name: Add Docker APT repository - Debian
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release|lower }} stable
         state: present
       become: true
-      when: ansible_os_family == 'Debian'
+      when: ansible_os_family == 'Debian' and docker_installed.rc != 0
+
+    - name: Update apt and install Docker CE, Docker CLI, containerd.io - Debian
+      ansible.builtin.package:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+      become: true
+      when: ansible_os_family == 'Debian' and docker_installed.rc != 0
+
+    - name: Install Docker Buildx Plugin - Debian
+      ansible.builtin.command: >
+        docker buildx install
+      become: true
+      when: ansible_os_family == 'Debian' and docker_installed.rc != 0
+
+    - name: Install Docker Compose - Debian and Ubuntu
+      ansible.builtin.get_url:
+        url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+      become: true
+      when: (ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian') and docker_installed.rc != 0
+
+    - name: Start and enable Docker service - Debian
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: yes
+      become: true
+      when: ansible_os_family == 'Debian' and docker_installed.rc != 0
+
+    - name: Check if Docker is installed - Fedora
+      ansible.builtin.command: "rpm -q docker-ce docker-ce-cli containerd.io"
+      register: docker_installed
+      changed_when: false
+      become: true
+      when: ansible_os_family == 'RedHat'
 
     - name: Install prerequisites - Fedora
       ansible.builtin.package:
@@ -20,21 +77,8 @@
           - dnf-plugins-core
           - curl
           - policycoreutils-python-utils
-        state: present
       become: true
-      when: ansible_os_family == 'RedHat'
-
-    - name: Add Docker APT key - Debian
-      ansible.builtin.apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-      become: true
-      when: ansible_os_family == 'Debian'
-
-    - name: Add Docker APT repository - Debian
-      ansible.builtin.apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
-      become: true
-      when: ansible_os_family == 'Debian'
+      when: ansible_os_family == 'RedHat' and docker_installed.rc != 0
 
     - name: Add Docker YUM repository - Fedora
       ansible.builtin.yum_repository:
@@ -44,29 +88,14 @@
         gpgcheck: yes
         gpgkey: https://download.docker.com/linux/fedora/gpg
       become: true
-      when: ansible_os_family == 'RedHat'
-
-    - name: Update apt and install Docker CE - Debian
-      ansible.builtin.package:
-        name: docker-ce
-        state: latest
-      become: true
-      when: ansible_os_family == 'Debian'
+      when: ansible_os_family == 'RedHat' and docker_installed.rc != 0
 
     - name: Install Docker CE - Fedora
       ansible.builtin.package:
         name: docker-ce
         state: latest
       become: true
-      when: ansible_os_family == 'RedHat'
-
-    - name: Install Docker Compose - Debian and Ubuntu
-      ansible.builtin.get_url:
-        url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
-        dest: /usr/local/bin/docker-compose
-        mode: '0755'
-      become: true
-      when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+      when: ansible_os_family == 'RedHat' and docker_installed.rc != 0
 
     - name: Install Docker Compose - Fedora
       ansible.builtin.get_url:
@@ -74,11 +103,12 @@
         dest: /usr/local/bin/docker-compose
         mode: '0755'
       become: true
-      when: ansible_distribution == 'Fedora'
+      when: ansible_os_family == 'RedHat' and docker_installed.rc != 0
 
-    - name: Start and enable Docker service
+    - name: Start and enable Docker service - Fedora
       ansible.builtin.service:
         name: docker
         state: started
         enabled: yes
       become: true
+      when: ansible_os_family == 'RedHat' and docker_installed.rc != 0
