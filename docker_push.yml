@@ -53,7 +53,7 @@
       ansible.builtin.git:
         repo: https://github.com/FabioArias0/web-rust-api
         dest: /path/to/web-rust-api
-            when: repo_stat.stat.isdir == False
+      when: repo_stat.stat.isdir == False
 
 
     - name: Add Docker APT key on Debian
