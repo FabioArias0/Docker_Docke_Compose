@@ -3,11 +3,11 @@
   hosts: all
   tasks:
     - name: Check if Docker is installed - Debian
-      ansible.builtin.command: "dpkg -l | grep -E '^ii' | grep -E 'docker-ce|docker-ce-cli|containerd.io'"
+      ansible.builtin.shell: "dpkg -l | grep -E '^ii' | grep -E 'docker-ce|docker-ce-cli|containerd.io'"
       register: docker_installed
       changed_when: false
       become: true
-      when: ansible_os_family == 'Debian'
+      when: ansible_os_family == 'Debian
 
     - name: Install prerequisites - Debian
       ansible.builtin.package:
