@@ -16,20 +16,6 @@
         state: present
       when: git_check.rc != 0
 
-    
-    - name: Add Docker APT repository
-      ansible.builtin.command: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-      when: ansible_os_family == 'Debian'
-
-    - name: Install Docker CE on Debian
-      ansible.builtin.package: 
-        name:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-        state: present
-      when: ansible_os_family == 'Debian'
-
     - name: Check if web-rust-api repository is already cloned
       ansible.builtin.stat:
         path: /path/to/web-rust-api
